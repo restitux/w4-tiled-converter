@@ -17,30 +17,38 @@ def tilemap(filename: str):
     # Get base filename
     base_filename = splitext(basename(splitext(filename)[0]))[0]
 
-    h_file = ""
-    c_file = ""
+    # general includes
+    includes = '#include <stdint.h>\n\n'
+
+    h_file = includes
+    c_file = f'#include "{basename(h_filename)}"\n\n'
 
     # get size of data
     data_h = tilemap["layers"][0]["height"]
     data_w = tilemap["layers"][0]["width"]
     data_len = data_h * data_w
 
+    varname = base_filename.upper()
+
     # c declaration for array name and type
-    tilemap_var = f"const uint32_t {base_filename.upper()}_tilemap[{data_len}]"
+    tilemap_var = f'const uint32_t {varname}_TILEMAP[{data_len}]'
 
     # Add array declaration to header file
-    h_file += tilemap_var + ";"
+    h_file += 'extern ' + tilemap_var + ';' + '\n'
+
+    # Add constants to source file
+    c_file += f'const uint32_t {varname}_TILEMAP_HEIGHT = {data_h};' + '\n'
+    c_file += f'const uint32_t {varname}_TILEMAP_WIDTH = {data_w};' + '\n'
 
     # Add array definition to source file
     c_file += tilemap_var
-    c_file += " = [\n"
+    c_file += " = {\n"
     data_str = [str(x) for x in tilemap["layers"][0]["data"]]
     c_file += ", ".join(data_str)
-    c_file += "];\n"
+    c_file += "};\n"
 
 
     # write header and source files to disk
-    #
     with open(h_filename, 'w') as f:
         f.write(h_file)
 
