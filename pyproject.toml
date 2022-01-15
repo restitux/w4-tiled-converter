@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "w4-tiled-converter"
+version = "0.1.0"
+description = "Convert tiled tilesets to c source for wasm4"
+authors = ["restitux <restitux@ohea.xyz>"]
+license = "MIT"
+
+[tool.poetry.scripts]
+w4-tiled-converter = 'w4_tiled_converter:main.main'
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
