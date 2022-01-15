@@ -1,8 +1,17 @@
-package = []
+[[package]]
+name = "pypng"
+version = "0.0.21"
+description = "Pure Python library for saving and loading PNG images"
+category = "main"
+optional = false
+python-versions = "*"
 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "17ca553b0bb9298a6ed528dd21e544ca433179192dba32a9920168e1c199d74f"
+content-hash = "a6a71cf710de9452ae1f7c17b628b6a05499afc2da6ffc9978e0784a5e4ffa46"
 
 [metadata.files]
+pypng = [
+    {file = "pypng-0.0.21-py3-none-any.whl", hash = "sha256:76f8a1539ec56451da7ab7121f12a361969fe0f2d48d703d198ce2a99d6c5afd"},
+]
