@@ -30,8 +30,8 @@ def convert(png_filename : str, h_filename : str, c_filename : str, tilesize : i
 
     tile_id = 0
     color_ids = []
-    for tile_x in range(0, png.size[0], tilesize):
-        for tile_y in range(0, png.size[1], tilesize):
+    for tile_y in range(0, png.size[1], tilesize):
+        for tile_x in range(0, png.size[0], tilesize):
             tile_region = (tile_x, tile_y, tile_x + tilesize, tile_y + tilesize)
             tile_colors = convert_region(tile_id, png.crop(tile_region))
             color_ids.extend(tile_colors)

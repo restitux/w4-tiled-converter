@@ -41,6 +41,7 @@ def tileset_subcommand(filename: str):
 
 
 def main():
+    # exit(-1)
     #print("w4 tileset converter")
 
     parser = argparse.ArgumentParser(description='Generate sources from a tilemap')
