@@ -6,18 +6,10 @@ category = "main"
 optional = false
 python-versions = ">=3.7"
 
-[[package]]
-name = "pypng"
-version = "0.0.21"
-description = "Pure Python library for saving and loading PNG images"
-category = "main"
-optional = false
-python-versions = "*"
-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "d3b56d694050aaa030bb7df80296e2237eda4ecf4e2d1b59787aa4c177f56b80"
+content-hash = "d3b4873a8c882f70cbe4301fd6ca9944d9bc1ad83447a3d1b122198a7c3bddb5"
 
 [metadata.files]
 pillow = [
@@ -53,7 +45,4 @@ pillow = [
     {file = "Pillow-9.0.0-pp37-pypy37_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6c5439bfb35a89cac50e81c751317faea647b9a3ec11c039900cd6915831064d"},
     {file = "Pillow-9.0.0-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:95545137fc56ce8c10de646074d242001a112a92de169986abd8c88c27566a05"},
     {file = "Pillow-9.0.0.tar.gz", hash = "sha256:ee6e2963e92762923956fe5d3479b1fdc3b76c83f290aad131a2f98c3df0593e"},
-]
-pypng = [
-    {file = "pypng-0.0.21-py3-none-any.whl", hash = "sha256:76f8a1539ec56451da7ab7121f12a361969fe0f2d48d703d198ce2a99d6c5afd"},
 ]
