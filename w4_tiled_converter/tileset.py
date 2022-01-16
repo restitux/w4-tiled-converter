@@ -1,8 +1,5 @@
 from PIL import Image
-import header
-
-TILESIZE = 8
-
+from w4_tiled_converter import sources
 
 def get_pixel_color_id(color):
     if color == (255, 0, 0):
@@ -28,25 +25,22 @@ def convert_region(tile_id, region):
     return result
 
 
-def convert(png):
+def convert(png_filename : str, h_filename : str, c_filename : str, tilesize : int):
+    png = Image.open(png_filename)
+    print(f"image is {png.format} of {png.size}")
+
     tile_id = 0
     color_ids = []
-    for tile_x in range(0, png.size[0], TILESIZE):
-        for tile_y in range(0, png.size[1], TILESIZE):
+    for tile_x in range(0, png.size[0], tilesize):
+        for tile_y in range(0, png.size[1], tilesize):
             print(tile_x, tile_y)
-            tile_region = (tile_x, tile_y, tile_x + 8, tile_y + 8)
-            tile_colors = convert_region(tile_id, im.crop(tile_region))
+            tile_region = (tile_x, tile_y, tile_x + tilesize, tile_y + tilesize)
+            tile_colors = convert_region(tile_id, png.crop(tile_region))
             color_ids.extend(tile_colors)
             tile_id += 1
             print(tile_colors)
 
 
-    h = header.Header()
-    h.add_tileset("tiles", TILESIZE, png.size[0], png.size[1], color_ids)
-    h.print()
-    h.to_file()
-
-if __name__ == "__main__":
-    im = Image.open('tiles.png')
-    print(f"image is {im.format} of {im.size}")
-    convert(im)
+    s = sources.Sources(h_filename, c_filename)
+    s.add_tileset("tiles", tilesize, png.size[0], png.size[1], color_ids)
+    s.to_file()
