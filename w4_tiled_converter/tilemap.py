@@ -6,7 +6,7 @@ class TileMap:
         self.data = data
 
     def to_c_str(self) -> tuple[str, str]:
-        data_str_list: list[str] = [str(x) for x in self.data]
+        data_str_list: list[str] = [str(x) if x >= 1 else str(x - 1) for x in self.data]
         data_str: str = ", ".join(data_str_list)
 
         return (
