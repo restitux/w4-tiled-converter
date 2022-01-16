@@ -1,18 +1,15 @@
-import json
+class TileMap:
+    def __init__(self, name, width, height, data) -> None:
+        self.name = name
+        self.width = width
+        self.height = height
+        self.data = data
 
-from w4_tiled_converter import sources
+    def to_c_str(self) -> tuple[str, str]:
+        data_str_list: list[str] = [str(x) for x in self.data]
+        data_str: str = ", ".join(data_str_list)
 
-def convert(tilemap_filename : str, h_filename : str, c_filename : str, name : str):
-
-    # Read in JSON tilemap
-    with open(tilemap_filename) as f:
-        tilemap = json.load(f)
-
-    data_h = tilemap["layers"][0]["height"]
-    data_w = tilemap["layers"][0]["width"]
-    data_len = data_h * data_w
-    data = tilemap["layers"][0]["data"]
-
-    s = sources.Sources(h_filename, c_filename)
-    s.add_tilemap(name, data_w, data_h, data)
-    s.to_file()
+        return (
+            f"extern const uint32_t {self.name}_tilemap[{len(self.data)}];\n",
+            f"const uint32_t {self.name}_tilemap[] =" + " {" + data_str + "};\n",
+        )
