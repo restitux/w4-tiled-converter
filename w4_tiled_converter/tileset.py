@@ -16,7 +16,6 @@ def get_pixel_color_id(color):
 
 
 def convert_region(tile_id, region):
-    print(f"handling tile {tile_id} (size: {region.size})")
     result = []
     for y in range(region.size[1]): #framebuffer coords = y * 160 + x
         for x in range(region.size[0]):
@@ -25,7 +24,7 @@ def convert_region(tile_id, region):
     return result
 
 
-def convert(png_filename : str, h_filename : str, c_filename : str, tilesize : int):
+def convert(png_filename : str, h_filename : str, c_filename : str, tilesize : int, name : str):
     png = Image.open(png_filename)
     print(f"image is {png.format} of {png.size}")
 
@@ -33,14 +32,12 @@ def convert(png_filename : str, h_filename : str, c_filename : str, tilesize : i
     color_ids = []
     for tile_x in range(0, png.size[0], tilesize):
         for tile_y in range(0, png.size[1], tilesize):
-            print(tile_x, tile_y)
             tile_region = (tile_x, tile_y, tile_x + tilesize, tile_y + tilesize)
             tile_colors = convert_region(tile_id, png.crop(tile_region))
             color_ids.extend(tile_colors)
             tile_id += 1
-            print(tile_colors)
 
 
     s = sources.Sources(h_filename, c_filename)
-    s.add_tileset("tiles", tilesize, png.size[0], png.size[1], color_ids)
+    s.add_tileset(name, tilesize, png.size[0], png.size[1], color_ids)
     s.to_file()

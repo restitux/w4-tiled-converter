@@ -12,7 +12,6 @@ class TwoBitImage:
         bs = []
         for i in range(0, len(self.data), 4):
             cols = self.data[i:i+4]
-            print(cols)
             str_col = ["{0:02b}".format(c) for c in cols]
             binary_cols = "".join(str_col)
             bs.append(f"0b{binary_cols}")
@@ -21,8 +20,8 @@ class TwoBitImage:
         array_define = ", ".join(bs)
 
         return (
-            f'extern const uint8_t {self.name}[{len(bs)}];\n',
-            f'const uint8_t {self.name}[] =' + ' {' + f'{array_define}' + '};\n'
+            f'extern const uint8_t {self.name}_tileset[{len(bs)}];\n',
+            f'const uint8_t {self.name}_tileset[] =' + ' {' + f'{array_define}' + '};\n'
         )
 
 class TileMap:
@@ -37,8 +36,8 @@ class TileMap:
         data_str : str = ", ".join(data_str_list)
 
         return (
-            f'extern const uint8_t {self.name}[{len(self.data)}];\n',
-            f'const uint8_t {self.name}[] =' + ' {' + data_str + '};\n'
+            f'extern const uint32_t {self.name}_tilemap[{len(self.data)}];\n',
+            f'const uint32_t {self.name}_tilemap[] =' + ' {' + data_str + '};\n'
         )
 
 class Sources:

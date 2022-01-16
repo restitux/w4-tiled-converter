@@ -2,7 +2,7 @@ import json
 
 from w4_tiled_converter import sources
 
-def convert(tilemap_filename : str, h_filename : str, c_filename : str):
+def convert(tilemap_filename : str, h_filename : str, c_filename : str, name : str):
 
     # Read in JSON tilemap
     with open(tilemap_filename) as f:
@@ -14,5 +14,5 @@ def convert(tilemap_filename : str, h_filename : str, c_filename : str):
     data = tilemap["layers"][0]["data"]
 
     s = sources.Sources(h_filename, c_filename)
-    s.add_tilemap("map", data_w, data_h, data)
+    s.add_tilemap(name, data_w, data_h, data)
     s.to_file()
