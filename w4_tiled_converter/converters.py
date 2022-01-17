@@ -1,4 +1,6 @@
 import json
+from os.path import basename, splitext
+
 from PIL import Image
 
 from w4_tiled_converter import sources, tilemap, tileset
@@ -57,18 +59,34 @@ def convert_tilemap(tilemap_filename: str, h_filename: str, c_filename: str, nam
 
     s = sources.Sources(h_filename, c_filename)
 
-    for layer in tilemap_json["layers"]:
+    tm = tilemap.TileMap(name)
+    for layer, tileset in zip(tilemap_json["layers"], tilemap_json["tilesets"]):
 
-        if layer["type"] != "tilelayer":
-            continue
+        if layer["type"] == "tilelayer":
+            layer_name = layer["name"]
+            data_h = layer["height"]
+            data_w = layer["width"]
+            data_len = data_h * data_w
+            data = layer["data"]
 
-        data_h = layer["height"]
-        data_w = layer["width"]
-        data_len = data_h * data_w
-        data = layer["data"]
+            tileset_name = basename(splitext(tileset["source"])[0]).replace("-", "_")
+            tileset_include = splitext(tileset["source"])[0] + ".set.h"
+            tileset_gid = tileset["firstgid"]
 
-        tm = tilemap.TileMap(f'{name}_{layer["name"]}', data_w, data_h, data)
+            tm.add_layer(
+                layer_name,
+                data_w,
+                data_h,
+                data,
+                (tileset_name, tileset_include, tileset_gid),
+            )
 
-        s.add_tilemap(tm)
+        # elif layer["type"] == "objectgroup" and layer["name"] == "entrances":
+        #    objects = layer["objects"]
 
+        #    og = objectgroup.ObjectGroup(name, objects)
+
+        #    s.add_entrances(og)
+
+    s.add_tilemap(tm)
     s.to_file()

@@ -7,7 +7,7 @@ class Sources:
     def __init__(self, h_filename: str, c_filename: str) -> None:
         self.h_filename: str = h_filename
         self.c_filename: str = c_filename
-        self.includes: list[str] = ["#include <stdint.h>\n"]
+        self.includes: list[str] = ["#include <stdint.h>\n", '#include "tiled.h"\n']
         self.defines: dict[str, str] = {}
         self.arrays: list[tuple[str, str]] = []
 
@@ -28,8 +28,9 @@ class Sources:
     def add_tilemap(self, tm: tilemap.TileMap):
         c_src = tm.to_c_str()
         self.add_array(c_src)
-        self.add_define(f"{tm.name}_HEIGHT", tm.width)
-        self.add_define(f"{tm.name}_WIDTH", tm.height)
+        includes = tm.includes()
+        for include in includes:
+            self.includes += f'#include "{include}"\n'
 
     def print_header(self) -> str:
         h = ""

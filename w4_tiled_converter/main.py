@@ -41,6 +41,42 @@ def tileset_subcommand(filename: str):
     )
 
 
+def header_subcommand(filename: str):
+    header = """
+#ifndef __TILED_H_
+#define __TILED_H_
+
+#include <stdint.h>
+
+struct TileSet {
+    const uint8_t *tileset;
+};
+
+struct TileMap_MapLayer {
+  uint32_t width;
+  uint32_t height;
+  uint32_t *map;
+  const struct TileSet *tileset;
+};
+
+struct TileMap_DataLayer {
+  uint32_t width;
+  uint32_t height;
+  uint32_t *map;
+};
+
+struct TileMap {
+  struct TileMap_MapLayer static_map;
+  struct TileMap_DataLayer collision_map;
+};
+
+#endif // __TILED_H
+"""
+
+    with open(filename, "w") as out:
+        out.write(header)
+
+
 def main():
     # exit(-1)
     # print("w4 tileset converter")
@@ -49,8 +85,8 @@ def main():
     parser.add_argument(
         "filetype",
         action="store",
-        help="tilemap or tileset",
-        choices=("tilemap", "tileset"),
+        help="tilemap, tileset or header",
+        choices=("tilemap", "tileset", "header"),
     )
     parser.add_argument("filename", action="store", help="filename")
 
@@ -58,8 +94,10 @@ def main():
 
     if args.filetype == "tilemap":
         tilemap_subcommand(args.filename)
-    else:
+    elif args.filetype == "tileset":
         tileset_subcommand(args.filename)
+    elif args.filetype == "header":
+        header_subcommand(args.filename)
 
 
 if __name__ == "__main__":

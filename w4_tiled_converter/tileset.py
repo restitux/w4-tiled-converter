@@ -13,12 +13,15 @@ class TileSet:
             binary_cols = "".join(str_col)
             bs.append(f"0b{binary_cols}")
 
-        array_define = ", ".join(bs)
+        array_str = ", ".join(bs)
 
-        return (
-            f"extern const uint8_t {self.name}_tileset[{len(bs)}];\n",
-            f"const uint8_t {self.name}_tileset[] ="
-            + " {"
-            + f"{array_define}"
-            + "};\n",
+        h = f"extern const struct TileSet {self.name}_tileset;\n"
+        c = (
+            f"const struct TileSet {self.name}_tileset = "
+            + "{\n"
+            + "    .tileset = (uint8_t[]){"
+            + array_str
+            + "}\n"
+            + "};\n"
         )
+        return (h, c)
