@@ -60,8 +60,7 @@ def convert_tilemap(tilemap_filename: str, h_filename: str, c_filename: str, nam
     s = sources.Sources(h_filename, c_filename)
 
     tm = tilemap.TileMap(name)
-    for layer, tileset in zip(tilemap_json["layers"], tilemap_json["tilesets"]):
-
+    for layer in tilemap_json["layers"]:
         if layer["type"] == "tilelayer":
             layer_name = layer["name"]
             data_h = layer["height"]
@@ -69,24 +68,20 @@ def convert_tilemap(tilemap_filename: str, h_filename: str, c_filename: str, nam
             data_len = data_h * data_w
             data = layer["data"]
 
-            tileset_name = basename(splitext(tileset["source"])[0]).replace("-", "_")
-            tileset_include = splitext(tileset["source"])[0] + ".set.h"
-            tileset_gid = tileset["firstgid"]
 
+            print(f"adding layer {layer_name}")
             tm.add_layer(
                 layer_name,
                 data_w,
                 data_h,
                 data,
-                (tileset_name, tileset_include, tileset_gid),
             )
 
-        # elif layer["type"] == "objectgroup" and layer["name"] == "entrances":
-        #    objects = layer["objects"]
-
-        #    og = objectgroup.ObjectGroup(name, objects)
-
-        #    s.add_entrances(og)
+    for tileset in tilemap_json['tilesets']:
+            tileset_name = basename(splitext(tileset["source"])[0]).replace("-", "_")
+            tileset_include = splitext(tileset["source"])[0] + ".set.h"
+            tileset_gid = tileset["firstgid"]
+            tm.add_tileset(tileset_name, (tileset_include, tileset_gid))
 
     s.add_tilemap(tm)
     s.to_file()

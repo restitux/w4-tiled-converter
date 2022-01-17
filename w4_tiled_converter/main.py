@@ -67,6 +67,7 @@ struct TileMap_DataLayer {
 
 struct TileMap {
   struct TileMap_MapLayer static_map;
+  struct TileMap_MapLayer overlay_map;
   struct TileMap_DataLayer collision_map;
 };
 
