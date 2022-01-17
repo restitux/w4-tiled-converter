@@ -59,6 +59,9 @@ def convert_tilemap(tilemap_filename: str, h_filename: str, c_filename: str, nam
 
     for layer in tilemap_json["layers"]:
 
+        if layer["type"] != "tilelayer":
+            continue
+
         data_h = layer["height"]
         data_w = layer["width"]
         data_len = data_h * data_w
