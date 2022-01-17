@@ -55,13 +55,17 @@ def convert_tilemap(tilemap_filename: str, h_filename: str, c_filename: str, nam
     with open(tilemap_filename) as f:
         tilemap_json = json.load(f)
 
-    data_h = tilemap_json["layers"][0]["height"]
-    data_w = tilemap_json["layers"][0]["width"]
-    data_len = data_h * data_w
-    data = tilemap_json["layers"][0]["data"]
-
-    tm = tilemap.TileMap(name, data_w, data_h, data)
-
     s = sources.Sources(h_filename, c_filename)
-    s.add_tilemap(tm)
+
+    for layer in tilemap_json["layers"]:
+
+        data_h = layer["height"]
+        data_w = layer["width"]
+        data_len = data_h * data_w
+        data = layer["data"]
+
+        tm = tilemap.TileMap(f'{name}_{layer["name"]}', data_w, data_h, data)
+
+        s.add_tilemap(tm)
+
     s.to_file()
