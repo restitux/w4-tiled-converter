@@ -47,29 +47,51 @@ def header_subcommand(filename: str):
 #define __TILED_H_
 
 #include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+struct Entrance;
 
 struct TileSet {
     const uint8_t *tileset;
 };
 
 struct TileMap_MapLayer {
-  uint32_t width;
-  uint32_t height;
-  uint32_t *map;
-  const struct TileSet *tileset;
+    uint32_t width;
+    uint32_t height;
+    uint32_t *map;
+    const struct TileSet *tileset;
 };
 
 struct TileMap_DataLayer {
-  uint32_t width;
-  uint32_t height;
-  uint32_t *map;
+    uint32_t width;
+    uint32_t height;
+    uint32_t *map;
+};
+
+struct TileMap_Entrance {
+    uint32_t x;
+    uint32_t y;
+    uint32_t width;
+    uint32_t height;
+    const struct TileMap *target_map;
+    bool is_entrance;
+    uint32_t target_entrance;
+};
+
+struct TileMap_Entrances {
+    struct TileMap_Entrance *entrances;
+    uint32_t length;
 };
 
 struct TileMap {
-  struct TileMap_MapLayer static_map;
-  struct TileMap_MapLayer overlay_map;
-  struct TileMap_DataLayer collision_map;
+    struct TileMap_MapLayer static_map;
+    struct TileMap_MapLayer overlay_map;
+    struct TileMap_DataLayer collision_map;
+    struct TileMap_Entrances entrances;
 };
+
+
 
 #endif // __TILED_H
 """
