@@ -50,7 +50,7 @@ class TileMap:
                 for p in o["properties"]:
                     props[p["name"]] = p["value"]
                 entrances_arr.append(
-                    "{"
+                    "(struct TileMap_Entrance){"
                     + f'.x = {o["x"]}, '
                     + f'.y = {o["y"]}, '
                     + f'.width = {o["width"]}, '
@@ -65,10 +65,8 @@ class TileMap:
             entrances_target_init_str = "\n".join(entrances_target_init)
             entrances_str = (
                 "    .entrances = {\n"
-                "        .entrances = (struct TileMap_Entrance[]){"
-                + entrances_arr_str
-                + "},\n"
-                + f"        .length = {len(entrances_arr_str)}\n"
+                f"        .entrances = {self.name}_entrances_data,\n"
+                + f"        .length = {len(entrances_arr)}\n"
                 + "    },\n"
             )
         else:
@@ -89,7 +87,8 @@ class TileMap:
             f"struct TileMap {self.name}_tilemap;\n\n"
             + f"const uint32_t {self.name}_static_map[] = {{{layers_data_str['static']}}};\n"
             + f"const uint32_t {self.name}_collision_map[] = {{{layers_data_str['collision']}}};\n"
-            + f"const uint32_t {self.name}_overlay_map[] = {{{layers_data_str['overlay']}}};\n"   
+            + f"const uint32_t {self.name}_overlay_map[] = {{{layers_data_str['overlay']}}};\n"
+            + f"struct TileMap_Entrance {self.name}_entrances_data[] = {{{entrances_arr_str}}};\n"   
             + f"void initalize_{self.name}_tilemap() " + "{\n"
             + f"{self.name}_tilemap = (struct TileMap)"
             + "{\n"
