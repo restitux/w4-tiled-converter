@@ -17,7 +17,7 @@ class TileMap:
     def fix_id(self, tile_id):
         if (tile_id & 0xFFF) > 0 and (tile_id & 0xFFF) < 257:
             return tile_id - 1
-        elif (tile_id & 0xFFF) > 257:
+        elif (tile_id & 0xFFF) >= 257:
             return tile_id - 257 
         else:
             return tile_id
