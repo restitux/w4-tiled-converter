@@ -68,7 +68,6 @@ def convert_tilemap(tilemap_filename: str, h_filename: str, c_filename: str, nam
             data_len = data_h * data_w
             data = layer["data"]
 
-
             print(f"adding layer {layer_name}")
             tm.add_layer(
                 layer_name,
@@ -76,12 +75,14 @@ def convert_tilemap(tilemap_filename: str, h_filename: str, c_filename: str, nam
                 data_h,
                 data,
             )
+        elif layer["type"] == "objectgroup" and layer["name"] == "entrances":
+            tm.add_entrances(layer)
 
-    for tileset in tilemap_json['tilesets']:
-            tileset_name = basename(splitext(tileset["source"])[0]).replace("-", "_")
-            tileset_include = splitext(tileset["source"])[0] + ".set.h"
-            tileset_gid = tileset["firstgid"]
-            tm.add_tileset(tileset_name, (tileset_include, tileset_gid))
+    for tileset in tilemap_json["tilesets"]:
+        tileset_name = basename(splitext(tileset["source"])[0]).replace("-", "_")
+        tileset_include = splitext(tileset["source"])[0] + ".set.h"
+        tileset_gid = tileset["firstgid"]
+        tm.add_tileset(tileset_name, (tileset_include, tileset_gid))
 
     s.add_tilemap(tm)
     s.to_file()
