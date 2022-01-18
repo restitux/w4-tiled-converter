@@ -44,7 +44,8 @@ class TileMap:
 
         if self.entrances and self.entrances["objects"]:
             entrances_arr = []
-            for o in self.entrances["objects"]:
+            entrances_target_init = []
+            for i, o in enumerate(self.entrances["objects"]):
                 props = {}
                 for p in o["properties"]:
                     props[p["name"]] = p["value"]
@@ -54,12 +55,14 @@ class TileMap:
                     + f'.y = {o["y"]}, '
                     + f'.width = {o["width"]}, '
                     + f'.height = {o["height"]}, '
-                    + f'.target_map = &{props["target_map"]}_tilemap, '
+                    + f'.target_map = NULL, '
                     + f'.target_entrance = {props["target_entrance"]}, '
                     + f'.is_entrance = {str(props["is_entrance"]).lower()}'
                     + "}"
                 )
+                entrances_target_init.append(f"{self.name}_tilemap.entrances.entrances[{i}].target_map = &{props['target_map']}_tilemap;")
             entrances_arr_str = ", ".join(entrances_arr)
+            entrances_target_init_str = "\n".join(entrances_target_init)
             entrances_str = (
                 "    .entrances = {\n"
                 "        .entrances = (struct TileMap_Entrance[]){"
@@ -75,39 +78,41 @@ class TileMap:
                 + "        .length = 0\n"
                 + "    },\n"
             )
+            entrances_target_init_str = ""
 
         static = self.layers["static"]
         collision = self.layers["collision"]
         overlay = self.layers["overlay"]
 
-        h = f"extern const struct TileMap {self.name}_tilemap;\n"
+        h = f"extern struct TileMap {self.name}_tilemap;\nvoid initalize_{self.name}_tilemap();\n"
         c = (
-            f"const struct TileMap {self.name}_tilemap = "
+            f"struct TileMap {self.name}_tilemap;\n\n"
+            + f"const uint32_t {self.name}_static_map[] = {{{layers_data_str['static']}}};\n"
+            + f"const uint32_t {self.name}_collision_map[] = {{{layers_data_str['collision']}}};\n"
+            + f"const uint32_t {self.name}_overlay_map[] = {{{layers_data_str['overlay']}}};\n"   
+            + f"void initalize_{self.name}_tilemap() " + "{\n"
+            + f"{self.name}_tilemap = (struct TileMap)"
             + "{\n"
             + "    .static_map = {\n"
             + f"        .width = {static[0]},\n"
             + f"        .height = {static[1]},\n"
-            + "        .map = (uint32_t []){"
-            + layers_data_str["static"]
-            + "},\n"
+            + f"        .map = {self.name}_static_map,\n"
             + f"        .tileset = &tiles_tileset\n"
             + "    },\n"
             + "    .collision_map = {\n"
             + f"        .width = {collision[0]},\n"
             + f"        .height = {collision[1]},\n"
-            + "        .map = (uint32_t []){"
-            + layers_data_str["collision"]
-            + "}\n"
+            + f"        .map = {self.name}_collision_map,\n"
             + "    },\n"
             + "    .overlay_map = {\n"
             + f"        .width = {overlay[0]},\n"
             + f"        .height = {overlay[1]},\n"
-            + "        .map = (uint32_t []){"
-            + layers_data_str["overlay"]
-            + "},\n"
+            + f"        .map = {self.name}_overlay_map,\n"
             + f"        .tileset = &tiles_tileset\n"
             + "    },\n"
             + entrances_str
             + "};\n"
+            + entrances_target_init_str
+            + "\n}"
         )
         return (h, c)
