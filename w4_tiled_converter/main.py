@@ -80,8 +80,19 @@ struct TileMap_Entrance {
     uint32_t target_entrance;
 };
 
+struct TileMap_BlockSpawn {
+    uint8_t x;
+    uint8_t y;
+    uint8_t id;
+};
+
 struct TileMap_Entrances {
     struct TileMap_Entrance *entrances;
+    uint32_t length;
+};
+
+struct TileMap_BlockSpawns {
+    struct TileMap_BlockSpawn *block_spawns;
     uint32_t length;
 };
 
@@ -90,6 +101,7 @@ struct TileMap {
     struct TileMap_MapLayer overlay_map;
     struct TileMap_DataLayer collision_map;
     struct TileMap_Entrances entrances;
+    struct TileMap_BlockSpawns block_spawns;
 };
 
 

@@ -4,6 +4,7 @@ from os.path import basename, splitext
 from PIL import Image
 
 from w4_tiled_converter import sources, tilemap, tileset
+from w4_tiled_converter.block_spawn import BlockSpawn
 
 
 def get_pixel_color_id(color):
@@ -75,8 +76,15 @@ def convert_tilemap(tilemap_filename: str, h_filename: str, c_filename: str, nam
                 data_h,
                 data,
             )
-        elif layer["type"] == "objectgroup" and layer["name"] == "entrances":
-            tm.add_entrances(layer)
+        elif layer["type"] == "objectgroup":
+            if layer["name"] == "entrances":
+                tm.add_entrances(layer)
+            if layer["name"] == "block-spawns":
+                for obj in layer["objects"]:
+                    x = int(obj["x"])
+                    y = int(obj["y"])
+                    id = int(obj["id"])
+                    tm.add_block_spawn(BlockSpawn(x, y, id))
 
     for tileset in tilemap_json["tilesets"]:
         tileset_name = basename(splitext(tileset["source"])[0]).replace("-", "_")

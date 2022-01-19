@@ -1,9 +1,14 @@
+from w4_tiled_converter import block_spawn
+from w4_tiled_converter.block_spawn import BlockSpawns
+
+
 class TileMap:
     def __init__(self, name) -> None:
         self.name = name
         self.entrances = {}
         self.layers = {}
         self.tilesets = {}
+        self.block_spawns = BlockSpawns(name)
 
     def add_layer(self, name, width, height, data):
         self.layers[name] = (width, height, data)
@@ -13,6 +18,9 @@ class TileMap:
 
     def add_entrances(self, entrances):
         self.entrances = entrances
+
+    def add_block_spawn(self, b):
+        self.block_spawns.block_spawns.add_spawn(b)
 
     def includes(self):
         includes = []
@@ -85,6 +93,9 @@ class TileMap:
             )
             entrances_target_init_str = ""
 
+        # if len(self.block_spawns.block_spawns) > 0:
+
+
         static = self.layers["static"]
         collision = self.layers["collision"]
         overlay = self.layers["overlay"]
@@ -96,6 +107,7 @@ class TileMap:
             + f"const uint16_t {self.name}_collision_map[] = {{{layers_data_str['collision']}}};\n"
             + f"const uint16_t {self.name}_overlay_map[] = {{{layers_data_str['overlay']}}};\n"
             + f"struct TileMap_Entrance {self.name}_entrances_data[] = {{{entrances_arr_str}}};\n"
+            + self.block_spawns.block_spawns.make_static_init() + "\n"
             + f"void initalize_{self.name}_tilemap() "
             + "{\n"
             + f"{self.name}_tilemap = (struct TileMap)"
@@ -118,6 +130,7 @@ class TileMap:
             + f"        .tileset = &tiles_tileset\n"
             + "    },\n"
             + entrances_str
+            +f"    .block_spawns = {self.block_spawns.make_assignment()}"
             + "};\n"
             + entrances_target_init_str
             + "\n}"
