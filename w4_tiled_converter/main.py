@@ -100,6 +100,7 @@ struct TileMap {
     struct TileMap_MapLayer static_map;
     struct TileMap_MapLayer overlay_map;
     struct TileMap_DataLayer collision_map;
+    struct TileMap_DataLayer special_map;
     struct TileMap_Entrances entrances;
     struct TileMap_BlockSpawns block_spawns;
 };

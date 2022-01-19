@@ -1,5 +1,6 @@
 from w4_tiled_converter import block_spawn
 from w4_tiled_converter.block_spawn import BlockSpawns
+from w4_tiled_converter.data_layer import DataLayer
 
 
 class TileMap:
@@ -7,11 +8,15 @@ class TileMap:
         self.name = name
         self.entrances = {}
         self.layers = {}
+        self.data_layers = {}
         self.tilesets = {}
         self.block_spawns = BlockSpawns(name)
 
     def add_layer(self, name, width, height, data):
         self.layers[name] = (width, height, data)
+
+    def add_data_layer(self, data_layer: DataLayer):
+        self.data_layers[data_layer.name] = data_layer
 
     def add_tileset(self, name, tileset):
         self.tilesets[name] = tileset
@@ -117,10 +122,12 @@ class TileMap:
         c = (
             f"struct TileMap {self.name}_tilemap;\n\n"
             + f"const uint16_t {self.name}_static_map[] = {{{layers_data_str['static']}}};\n"
-            + f"const uint8_t {self.name}_collision_map[] = {{{layers_data_str['collision']}}};\n"
+            # + f"const uint8_t {self.name}_collision_map[] = {{{layers_data_str['collision']}}};\n"
             + f"const uint16_t {self.name}_overlay_map[] = {{{layers_data_str['overlay']}}};\n"
             + f"struct TileMap_Entrance {self.name}_entrances_data[] = {{{entrances_arr_str}}};\n"
             + self.block_spawns.block_spawns.make_static_init() + "\n"
+            + self.data_layers["collision"].make_static_initalization() + '\n'
+            + self.data_layers["special"].make_static_initalization() + '\n'
             + f"void initalize_{self.name}_tilemap() "
             + "{\n"
             + f"{self.name}_tilemap = (struct TileMap)"
@@ -131,12 +138,9 @@ class TileMap:
             + f"        .map = {self.name}_static_map,\n"
             + f"        .tileset = &tiles_tileset\n"
             + "    },\n"
-            + "    .collision_map = {\n"
-            + f"        .width = {collision[0]},\n"
-            + f"        .height = {collision[1]},\n"
-            + f"        .map = {self.name}_collision_map,\n"
-            + "    },\n"
-            + "    .overlay_map = {\n"
+            + f"    .collision_map = {self.data_layers['collision'].make_assignment()}"
+            + f"    .special_map = {self.data_layers['special'].make_assignment()}"
+            +  "    .overlay_map = {\n"
             + f"        .width = {overlay[0]},\n"
             + f"        .height = {overlay[1]},\n"
             + f"        .map = {self.name}_overlay_map,\n"
