@@ -81,8 +81,8 @@ struct TileMap_Entrance {
 };
 
 struct TileMap_BlockSpawn {
-    uint8_t x;
-    uint8_t y;
+    uint32_t x;
+    uint32_t y;
     uint8_t id;
 };
 
