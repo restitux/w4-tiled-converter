@@ -10,6 +10,7 @@ class Sources:
         self.includes: list[str] = ["#include <stdint.h>\n", '#include "tiled.h"\n']
         self.defines: dict[str, str] = {}
         self.arrays: list[tuple[str, str]] = []
+        self.name = ""
 
     def add_define(self, name: str, value: str):
         self.defines[name] = value
@@ -31,9 +32,13 @@ class Sources:
         includes = tm.includes()
         for include in includes:
             self.includes += f'#include "{include}"\n'
+        self.name = tm.name
 
     def print_header(self) -> str:
-        h = ""
+        h = (
+            f"#ifndef __{self.name.upper()}_H_\n"
+            + f"#define __{self.name.upper()}_H_\n"
+        )
 
         for v in self.includes:
             h += v
@@ -43,6 +48,8 @@ class Sources:
 
         for v in self.arrays:
             h += v[0]
+
+        h += f"#endif // __{self.name.upper()}_H_\n"
 
         return h
 

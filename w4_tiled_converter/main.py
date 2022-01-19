@@ -59,14 +59,14 @@ struct TileSet {
 struct TileMap_MapLayer {
     uint32_t width;
     uint32_t height;
-    const uint32_t *map;
+    const uint16_t *map;
     const struct TileSet *tileset;
 };
 
 struct TileMap_DataLayer {
     uint32_t width;
     uint32_t height;
-    const uint32_t *map;
+    const uint16_t *map;
 };
 
 struct TileMap_Entrance {
@@ -74,6 +74,7 @@ struct TileMap_Entrance {
     uint32_t y;
     uint32_t width;
     uint32_t height;
+    uint8_t id;
     const struct TileMap *target_map;
     bool is_entrance;
     uint32_t target_entrance;

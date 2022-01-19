@@ -28,12 +28,16 @@ class TileMap:
         return includes
 
     def fix_id(self, tile_id):
-        if (tile_id & 0xFFF) > 0 and (tile_id & 0xFFF) < 257:
-            return tile_id - 1
-        elif (tile_id & 0xFFF) >= 257:
-            return tile_id - 257 
+        id_bits = tile_id & 0xFFF
+        rotation_bits = (tile_id & (0xF << 28)) >> 16
+        new_tile_id = id_bits | rotation_bits
+
+        if id_bits > 0 and id_bits < 257:
+            return new_tile_id - 1
+        elif id_bits >= 257:
+            return new_tile_id - 257
         else:
-            return tile_id
+            return new_tile_id
 
     def to_c_str(self) -> tuple[str, str]:
 
@@ -55,12 +59,15 @@ class TileMap:
                     + f'.y = {o["y"]}, '
                     + f'.width = {o["width"]}, '
                     + f'.height = {o["height"]}, '
-                    + f'.target_map = NULL, '
+                    + f'.id = {o["id"]}, '
+                    + f".target_map = NULL, "
                     + f'.target_entrance = {props["target_entrance"]}, '
                     + f'.is_entrance = {str(props["is_entrance"]).lower()}'
                     + "}"
                 )
-                entrances_target_init.append(f"{self.name}_tilemap.entrances.entrances[{i}].target_map = &{props['target_map']}_tilemap;")
+                entrances_target_init.append(
+                    f"{self.name}_tilemap.entrances.entrances[{i}].target_map = &{props['target_map']}_tilemap;"
+                )
             entrances_arr_str = ", ".join(entrances_arr)
             entrances_target_init_str = "\n".join(entrances_target_init)
             entrances_str = (
@@ -85,11 +92,12 @@ class TileMap:
         h = f"extern struct TileMap {self.name}_tilemap;\nvoid initalize_{self.name}_tilemap();\n"
         c = (
             f"struct TileMap {self.name}_tilemap;\n\n"
-            + f"const uint32_t {self.name}_static_map[] = {{{layers_data_str['static']}}};\n"
-            + f"const uint32_t {self.name}_collision_map[] = {{{layers_data_str['collision']}}};\n"
-            + f"const uint32_t {self.name}_overlay_map[] = {{{layers_data_str['overlay']}}};\n"
-            + f"struct TileMap_Entrance {self.name}_entrances_data[] = {{{entrances_arr_str}}};\n"   
-            + f"void initalize_{self.name}_tilemap() " + "{\n"
+            + f"const uint16_t {self.name}_static_map[] = {{{layers_data_str['static']}}};\n"
+            + f"const uint16_t {self.name}_collision_map[] = {{{layers_data_str['collision']}}};\n"
+            + f"const uint16_t {self.name}_overlay_map[] = {{{layers_data_str['overlay']}}};\n"
+            + f"struct TileMap_Entrance {self.name}_entrances_data[] = {{{entrances_arr_str}}};\n"
+            + f"void initalize_{self.name}_tilemap() "
+            + "{\n"
             + f"{self.name}_tilemap = (struct TileMap)"
             + "{\n"
             + "    .static_map = {\n"
