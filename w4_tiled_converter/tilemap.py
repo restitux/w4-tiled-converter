@@ -47,12 +47,25 @@ class TileMap:
         else:
             return new_tile_id
 
+    def make_collision_data_str(self, data):
+        binary_data = [0 if d == 0 else 1 for d in data]
+        out = []
+        for i in range(0, len(binary_data), 8):
+            b = binary_data[i:i+8]
+            b.reverse() #lsb should be 0 index
+            b_str = "".join([str(bit) for bit in b]) 
+            out.append(f"0b{b_str}")
+        return ", ".join(out)
+
     def to_c_str(self) -> tuple[str, str]:
 
         layers_data_str = {}
         for name, (_, _, data) in self.layers.items():
-            data_str_list: list[str] = [str(self.fix_id(int(x))) for x in data]
-            layers_data_str[name] = ", ".join(data_str_list)
+            if name == "collision":
+                layers_data_str[name] = self.make_collision_data_str(data)
+            else:    
+                data_str_list: list[str] = [str(self.fix_id(int(x))) for x in data]
+                layers_data_str[name] = ", ".join(data_str_list)
 
         if self.entrances and self.entrances["objects"]:
             entrances_arr = []
@@ -104,7 +117,7 @@ class TileMap:
         c = (
             f"struct TileMap {self.name}_tilemap;\n\n"
             + f"const uint16_t {self.name}_static_map[] = {{{layers_data_str['static']}}};\n"
-            + f"const uint16_t {self.name}_collision_map[] = {{{layers_data_str['collision']}}};\n"
+            + f"const uint8_t {self.name}_collision_map[] = {{{layers_data_str['collision']}}};\n"
             + f"const uint16_t {self.name}_overlay_map[] = {{{layers_data_str['overlay']}}};\n"
             + f"struct TileMap_Entrance {self.name}_entrances_data[] = {{{entrances_arr_str}}};\n"
             + self.block_spawns.block_spawns.make_static_init() + "\n"

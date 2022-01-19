@@ -66,7 +66,7 @@ struct TileMap_MapLayer {
 struct TileMap_DataLayer {
     uint32_t width;
     uint32_t height;
-    const uint16_t *map;
+    const uint8_t *map;
 };
 
 struct TileMap_Entrance {
