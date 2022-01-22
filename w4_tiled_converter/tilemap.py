@@ -40,6 +40,11 @@ class TileMap:
 
         return includes
 
+    def split_id(self, tile_id) -> tuple[int, int]:
+        id_bits = tile_id & 0xFFF
+        rotation_bits = (tile_id & (0xF << 28)) >> 28
+        return (id_bits, rotation_bits)
+
     def fix_id(self, tile_id):
         id_bits = tile_id & 0xFFF
         rotation_bits = (tile_id & (0xF << 28)) >> 16
@@ -52,13 +57,37 @@ class TileMap:
         else:
             return new_tile_id
 
+    def make_static_data_str(self, data) -> tuple[str, str]:
+
+        split_id_list: list[tuple[int, int]] = [self.split_id(x) for x in data]
+
+        data_str_list: list[str] = [
+            str(x[0] - 1) if x[0] >= 1 else str(x[0]) for x in split_id_list
+        ]
+        data_str: str = ", ".join(data_str_list)
+
+        data_rot_str_list: list[str] = []
+        for i in range(0, len(split_id_list), 2):
+            lsb: str = format(split_id_list[i][1], "04b")
+            msb: str = format(split_id_list[i + 1][1], "04b")
+            c_bits: str = f"0b{msb}{lsb}"
+            if len(c_bits) != 10:
+                raise Exception(
+                    f'packed static data rotation bits "{c_bits}" at index "{i}" was the wrong length'
+                )
+            data_rot_str_list.append(c_bits)
+        data_rot_str: str = ", ".join(data_rot_str_list)
+
+        print(len(data_str_list), len(data_rot_str_list))
+        return (data_str, data_rot_str)
+
     def make_collision_data_str(self, data):
         binary_data = [0 if d == 0 else 1 for d in data]
         out = []
         for i in range(0, len(binary_data), 8):
-            b = binary_data[i:i+8]
-            b.reverse() #lsb should be 0 index
-            b_str = "".join([str(bit) for bit in b]) 
+            b = binary_data[i : i + 8]
+            b.reverse()  # lsb should be 0 index
+            b_str = "".join([str(bit) for bit in b])
             out.append(f"0b{b_str}")
         return ", ".join(out)
 
@@ -68,9 +97,8 @@ class TileMap:
         for name, (_, _, data) in self.layers.items():
             if name == "collision":
                 layers_data_str[name] = self.make_collision_data_str(data)
-            else:    
-                data_str_list: list[str] = [str(self.fix_id(int(x))) for x in data]
-                layers_data_str[name] = ", ".join(data_str_list)
+            else:
+                layers_data_str[name] = self.make_static_data_str(data)
 
         if self.entrances and self.entrances["objects"]:
             entrances_arr = []
@@ -113,7 +141,6 @@ class TileMap:
 
         # if len(self.block_spawns.block_spawns) > 0:
 
-
         static = self.layers["static"]
         collision = self.layers["collision"]
         overlay = self.layers["overlay"]
@@ -121,13 +148,17 @@ class TileMap:
         h = f"extern struct TileMap {self.name}_tilemap;\nvoid initalize_{self.name}_tilemap();\n"
         c = (
             f"struct TileMap {self.name}_tilemap;\n\n"
-            + f"const uint16_t {self.name}_static_map[] = {{{layers_data_str['static']}}};\n"
-            # + f"const uint8_t {self.name}_collision_map[] = {{{layers_data_str['collision']}}};\n"
-            + f"const uint16_t {self.name}_overlay_map[] = {{{layers_data_str['overlay']}}};\n"
+            + f"const uint8_t {self.name}_static_map[] = {{{layers_data_str['static'][0]}}};\n"
+            + f"const uint8_t {self.name}_static_map_rotations[] = {{{layers_data_str['static'][1]}}};\n"
+            + f"const uint8_t {self.name}_overlay_map[] = {{{layers_data_str['overlay'][0]}}};\n"
+            + f"const uint8_t {self.name}_overlay_map_rotations[] = {{{layers_data_str['overlay'][1]}}};\n"
             + f"struct TileMap_Entrance {self.name}_entrances_data[] = {{{entrances_arr_str}}};\n"
-            + self.block_spawns.block_spawns.make_static_init() + "\n"
-            + self.data_layers["collision"].make_static_initalization() + '\n'
-            + self.data_layers["special"].make_static_initalization() + '\n'
+            + self.block_spawns.block_spawns.make_static_init()
+            + "\n"
+            + self.data_layers["collision"].make_static_initalization()
+            + "\n"
+            + self.data_layers["special"].make_static_initalization()
+            + "\n"
             + f"void initalize_{self.name}_tilemap() "
             + "{\n"
             + f"{self.name}_tilemap = (struct TileMap)"
@@ -136,18 +167,20 @@ class TileMap:
             + f"        .width = {static[0]},\n"
             + f"        .height = {static[1]},\n"
             + f"        .map = {self.name}_static_map,\n"
+            + f"        .map_rotations = {self.name}_static_map_rotations,\n"
             + f"        .tileset = &tiles_tileset\n"
             + "    },\n"
             + f"    .collision_map = {self.data_layers['collision'].make_assignment()}"
             + f"    .special_map = {self.data_layers['special'].make_assignment()}"
-            +  "    .overlay_map = {\n"
+            + "    .overlay_map = {\n"
             + f"        .width = {overlay[0]},\n"
             + f"        .height = {overlay[1]},\n"
             + f"        .map = {self.name}_overlay_map,\n"
+            + f"        .map_rotations = {self.name}_overlay_map_rotations,\n"
             + f"        .tileset = &tiles_tileset\n"
             + "    },\n"
             + entrances_str
-            +f"    .block_spawns = {self.block_spawns.make_assignment()}"
+            + f"    .block_spawns = {self.block_spawns.make_assignment()}"
             + "};\n"
             + entrances_target_init_str
             + "\n}"

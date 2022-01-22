@@ -59,7 +59,8 @@ struct TileSet {
 struct TileMap_MapLayer {
     uint32_t width;
     uint32_t height;
-    const uint16_t *map;
+    const uint8_t *map;
+    const uint8_t *map_rotations;
     const struct TileSet *tileset;
 };
 
