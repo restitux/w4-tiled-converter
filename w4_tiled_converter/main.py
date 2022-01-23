@@ -98,6 +98,7 @@ struct TileMap_BlockSpawns {
 };
 
 struct TileMap {
+    uint16_t id;
     struct TileMap_MapLayer static_map;
     struct TileMap_MapLayer overlay_map;
     struct TileMap_DataLayer collision_map;

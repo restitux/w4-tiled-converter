@@ -3,6 +3,8 @@ from w4_tiled_converter.block_spawn import BlockSpawns
 from w4_tiled_converter.image_layer import ImageLayer
 from w4_tiled_converter.data_layer import DataLayer
 
+import hashlib
+
 
 class TileMap:
     def __init__(self, name) -> None:
@@ -13,6 +15,8 @@ class TileMap:
         self.data_layers = {}
         self.tilesets = {}
         self.block_spawns = BlockSpawns(name)
+        name_hash = hashlib.md5(name.encode("utf-8")).hexdigest()
+        self.name_hash = str(int(name_hash, 16) % (2 ** 16) - 1)
 
     def add_layer(self, name, width, height, data):
         self.layers[name] = (width, height, data)
@@ -169,6 +173,7 @@ class TileMap:
             + "{\n"
             + f"{self.name}_tilemap = (struct TileMap)"
             + "{\n"
+            + f"    .id = {self.name_hash},\n"
             + "    .static_map = {\n"
             + f"        .width = {static[0]},\n"
             + f"        .height = {static[1]},\n"

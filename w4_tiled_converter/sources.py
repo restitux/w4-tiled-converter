@@ -1,3 +1,4 @@
+import hashlib
 from os.path import basename
 
 from w4_tiled_converter import tilemap, tileset
@@ -33,6 +34,7 @@ class Sources:
         for include in includes:
             self.includes += f'#include "{include}"\n'
         self.name = tm.name
+        self.add_define(f"TILEMAP_{tm.name.upper()}_ID", tm.name_hash)
 
     def print_header(self) -> str:
         h = (
