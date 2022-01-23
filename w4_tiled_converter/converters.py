@@ -4,6 +4,7 @@ from os.path import basename, splitext
 from PIL import Image
 
 from w4_tiled_converter import sources, tilemap, tileset
+from w4_tiled_converter.text_trigger import TextTrigger
 from w4_tiled_converter.block_spawn import BlockSpawn
 from w4_tiled_converter.image_layer import ImageLayer
 from w4_tiled_converter.data_layer import DataLayer
@@ -103,6 +104,14 @@ def convert_tilemap(tilemap_filename: str, h_filename: str, c_filename: str, nam
                     y = int(obj["y"])
                     id = int(obj["id"])
                     tm.add_block_spawn(BlockSpawn(x, y, id))
+            if layer["name"] == "text-triggers":
+                for obj in layer["objects"]:
+                    x = int(obj["x"])
+                    y = int(obj["y"])
+                    width = int(obj["width"])
+                    height = int(obj["height"])
+                    string = get_property(obj, "string")
+                    tm.add_text_trigger(TextTrigger(x, y, width, height, string))
 
     for tileset in tilemap_json["tilesets"]:
         tileset_name = basename(splitext(tileset["source"])[0]).replace("-", "_")

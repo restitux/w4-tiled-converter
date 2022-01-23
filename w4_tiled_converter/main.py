@@ -97,6 +97,20 @@ struct TileMap_BlockSpawns {
     uint32_t length;
 };
 
+struct TileMap_TextTrigger {
+    uint32_t x;
+    uint32_t y;
+    uint32_t width;
+    uint32_t height;
+    char *string;
+    uint16_t length;
+};
+
+struct TileMap_TextTriggers {
+    struct TileMap_TextTrigger *text_triggers;
+    uint32_t length;
+};
+
 struct TileMap {
     uint16_t id;
     struct TileMap_MapLayer static_map;
@@ -105,6 +119,7 @@ struct TileMap {
     struct TileMap_DataLayer special_map;
     struct TileMap_Entrances entrances;
     struct TileMap_BlockSpawns block_spawns;
+    struct TileMap_TextTriggers text_triggers;
 };
 
 

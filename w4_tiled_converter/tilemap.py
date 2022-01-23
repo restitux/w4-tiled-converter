@@ -1,4 +1,5 @@
 from w4_tiled_converter import block_spawn
+from w4_tiled_converter.text_trigger import TextTriggers
 from w4_tiled_converter.block_spawn import BlockSpawns
 from w4_tiled_converter.image_layer import ImageLayer
 from w4_tiled_converter.data_layer import DataLayer
@@ -15,6 +16,7 @@ class TileMap:
         self.data_layers = {}
         self.tilesets = {}
         self.block_spawns = BlockSpawns(name)
+        self.text_triggers = TextTriggers(name)
         name_hash = hashlib.md5(name.encode("utf-8")).hexdigest()
         self.name_hash = str(int(name_hash, 16) % (2 ** 16) - 1)
 
@@ -35,6 +37,9 @@ class TileMap:
 
     def add_block_spawn(self, b):
         self.block_spawns.block_spawns.add_spawn(b)
+
+    def add_text_trigger(self, t):
+        self.text_triggers.text_triggers.add_trigger(t)
 
     def includes(self):
         includes = []
@@ -164,6 +169,7 @@ class TileMap:
             # + f"const uint8_t {self.name}_overlay_map_rotations[] = {{{layers_data_str['overlay'][1]}}};\n"
             + f"struct TileMap_Entrance {self.name}_entrances_data[] = {{{entrances_arr_str}}};\n"
             + self.block_spawns.block_spawns.make_static_init()
+            + self.text_triggers.text_triggers.make_static_init()
             + "\n"
             + self.data_layers["collision"].make_static_initalization()
             + "\n"
@@ -193,6 +199,7 @@ class TileMap:
             # + "    },\n"
             + entrances_str
             + f"    .block_spawns = {self.block_spawns.make_assignment()}"
+            + f"    .text_triggers = {self.text_triggers.make_assignment()}"
             + "};\n"
             + entrances_target_init_str
             + "\n}"
