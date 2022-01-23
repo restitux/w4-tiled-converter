@@ -98,6 +98,7 @@ struct TileMap_BlockSpawns {
 };
 
 struct TileMap_TextTrigger {
+    uint8_t id;
     uint32_t x;
     uint32_t y;
     uint32_t width;

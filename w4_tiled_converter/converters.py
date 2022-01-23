@@ -106,12 +106,13 @@ def convert_tilemap(tilemap_filename: str, h_filename: str, c_filename: str, nam
                     tm.add_block_spawn(BlockSpawn(x, y, id))
             if layer["name"] == "text-triggers":
                 for obj in layer["objects"]:
+                    id = int(obj["id"])
                     x = int(obj["x"])
                     y = int(obj["y"])
                     width = int(obj["width"])
                     height = int(obj["height"])
                     string = get_property(obj, "string")
-                    tm.add_text_trigger(TextTrigger(x, y, width, height, string))
+                    tm.add_text_trigger(TextTrigger(id, x, y, width, height, string))
 
     for tileset in tilemap_json["tilesets"]:
         tileset_name = basename(splitext(tileset["source"])[0]).replace("-", "_")

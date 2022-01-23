@@ -1,7 +1,10 @@
 class TextTrigger:
     STRUCT_NAME = "TileMap_TextTrigger"
 
-    def __init__(self, x: int, y: int, width: int, height: int, string: str) -> None:
+    def __init__(
+        self, id: int, x: int, y: int, width: int, height: int, string: str
+    ) -> None:
+        self.id = id
         self.x = x
         self.y = y
         self.width = width
@@ -10,7 +13,7 @@ class TextTrigger:
         self.id = id
 
     def make_static_init_entry(self) -> str:
-        return f'({TextTrigger.typename()}) {{.x={self.x}, .y={self.y},  .width={self.width}, .height={self.height}, .string = "{self.string}", .length={len(self.string)}}}'
+        return f'({TextTrigger.typename()}) {{.id = {self.id}, .x={self.x}, .y={self.y},  .width={self.width}, .height={self.height}, .string = "{self.string}", .length={len(self.string)}}}'
 
     def typename() -> str:
         return f"struct {TextTrigger.STRUCT_NAME}"
