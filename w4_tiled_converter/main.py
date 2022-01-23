@@ -105,6 +105,7 @@ struct TileMap_TextTrigger {
     uint32_t height;
     char *string;
     uint16_t length;
+    int8_t ability_pickup;
 };
 
 struct TileMap_TextTriggers {

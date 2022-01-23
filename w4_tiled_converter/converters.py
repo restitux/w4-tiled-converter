@@ -112,7 +112,8 @@ def convert_tilemap(tilemap_filename: str, h_filename: str, c_filename: str, nam
                     width = int(obj["width"])
                     height = int(obj["height"])
                     string = get_property(obj, "string")
-                    tm.add_text_trigger(TextTrigger(id, x, y, width, height, string))
+                    ability = get_property(obj, "ability")
+                    tm.add_text_trigger(TextTrigger(id, x, y, width, height, string, ability))
 
     for tileset in tilemap_json["tilesets"]:
         tileset_name = basename(splitext(tileset["source"])[0]).replace("-", "_")
