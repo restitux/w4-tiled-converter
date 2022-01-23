@@ -98,7 +98,6 @@ class ImageLayer:
                 room_row_base: int = ROOM_WIDTH * room_x
                 # get the index of the top left corner of the room
                 room_base: int = room_row_base + room_column_base
-                print(room_base)
 
                 tiles: list[int] = []
                 # add tiles from all room rows to array
