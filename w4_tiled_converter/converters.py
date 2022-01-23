@@ -5,6 +5,7 @@ from PIL import Image
 
 from w4_tiled_converter import sources, tilemap, tileset
 from w4_tiled_converter.block_spawn import BlockSpawn
+from w4_tiled_converter.image_layer import ImageLayer
 from w4_tiled_converter.data_layer import DataLayer
 
 
@@ -52,12 +53,14 @@ def convert_tileset(
     s.add_tileset(name, tilesize, ts)
     s.to_file()
 
+
 def get_property(layer, name: str) -> str:
-    if (layer['properties']):
-        for p in layer['properties']:
-            if p['name'] == name:
-                return p['value']
+    if layer["properties"]:
+        for p in layer["properties"]:
+            if p["name"] == name:
+                return p["value"]
     return None
+
 
 def convert_tilemap(tilemap_filename: str, h_filename: str, c_filename: str, name: str):
 
@@ -75,16 +78,22 @@ def convert_tilemap(tilemap_filename: str, h_filename: str, c_filename: str, nam
             data_w = layer["width"]
             data_len = data_h * data_w
             data = layer["data"]
-            if get_property(layer, 'kind') == "data":
-                tm.add_data_layer(DataLayer(name, layer_name, int(data_w), int(data_h), data))
-
-            print(f"adding layer {layer_name}")
-            tm.add_layer(
-                layer_name,
-                data_w,
-                data_h,
-                data,
-            )
+            if get_property(layer, "kind") == "data":
+                tm.add_data_layer(
+                    DataLayer(name, layer_name, int(data_w), int(data_h), data)
+                )
+            elif layer_name == "overlay":
+                tm.add_image_layer(
+                    ImageLayer(name, layer_name, int(data_w), int(data_h), data)
+                )
+            else:
+                print(f"adding layer {layer_name}")
+                tm.add_layer(
+                    layer_name,
+                    data_w,
+                    data_h,
+                    data,
+                )
         elif layer["type"] == "objectgroup":
             if layer["name"] == "entrances":
                 tm.add_entrances(layer)

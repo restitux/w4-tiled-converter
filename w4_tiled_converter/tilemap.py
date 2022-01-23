@@ -1,5 +1,6 @@
 from w4_tiled_converter import block_spawn
 from w4_tiled_converter.block_spawn import BlockSpawns
+from w4_tiled_converter.image_layer import ImageLayer
 from w4_tiled_converter.data_layer import DataLayer
 
 
@@ -8,12 +9,16 @@ class TileMap:
         self.name = name
         self.entrances = {}
         self.layers = {}
+        self.image_layers = {}
         self.data_layers = {}
         self.tilesets = {}
         self.block_spawns = BlockSpawns(name)
 
     def add_layer(self, name, width, height, data):
         self.layers[name] = (width, height, data)
+
+    def add_image_layer(self, image_layer: ImageLayer):
+        self.image_layers[image_layer.name] = image_layer
 
     def add_data_layer(self, data_layer: DataLayer):
         self.data_layers[data_layer.name] = data_layer
@@ -78,7 +83,6 @@ class TileMap:
             data_rot_str_list.append(c_bits)
         data_rot_str: str = ", ".join(data_rot_str_list)
 
-        print(len(data_str_list), len(data_rot_str_list))
         return (data_str, data_rot_str)
 
     def make_collision_data_str(self, data):
@@ -142,16 +146,18 @@ class TileMap:
         # if len(self.block_spawns.block_spawns) > 0:
 
         static = self.layers["static"]
-        collision = self.layers["collision"]
-        overlay = self.layers["overlay"]
+        # collision = self.layers["collision"]
+        # overlay = self.layers["overlay"]
 
         h = f"extern struct TileMap {self.name}_tilemap;\nvoid initalize_{self.name}_tilemap();\n"
         c = (
             f"struct TileMap {self.name}_tilemap;\n\n"
             + f"const uint8_t {self.name}_static_map[] = {{{layers_data_str['static'][0]}}};\n"
             + f"const uint8_t {self.name}_static_map_rotations[] = {{{layers_data_str['static'][1]}}};\n"
-            + f"const uint8_t {self.name}_overlay_map[] = {{{layers_data_str['overlay'][0]}}};\n"
-            + f"const uint8_t {self.name}_overlay_map_rotations[] = {{{layers_data_str['overlay'][1]}}};\n"
+            + self.image_layers["overlay"].make_static_initalization()
+            + "\n"
+            # + f"const uint8_t {self.name}_overlay_map[] = {{{layers_data_str['overlay'][0]}}};\n"
+            # + f"const uint8_t {self.name}_overlay_map_rotations[] = {{{layers_data_str['overlay'][1]}}};\n"
             + f"struct TileMap_Entrance {self.name}_entrances_data[] = {{{entrances_arr_str}}};\n"
             + self.block_spawns.block_spawns.make_static_init()
             + "\n"
@@ -172,13 +178,14 @@ class TileMap:
             + "    },\n"
             + f"    .collision_map = {self.data_layers['collision'].make_assignment()}"
             + f"    .special_map = {self.data_layers['special'].make_assignment()}"
-            + "    .overlay_map = {\n"
-            + f"        .width = {overlay[0]},\n"
-            + f"        .height = {overlay[1]},\n"
-            + f"        .map = {self.name}_overlay_map,\n"
-            + f"        .map_rotations = {self.name}_overlay_map_rotations,\n"
-            + f"        .tileset = &tiles_tileset\n"
-            + "    },\n"
+            + f"    .overlay_map = {self.image_layers['overlay'].make_assignment()}"
+            # + "    .overlay_map = {\n"
+            # + f"        .width = {overlay[0]},\n"
+            # + f"        .height = {overlay[1]},\n"
+            # + f"        .map = {self.name}_overlay_map,\n"
+            # + f"        .map_rotations = {self.name}_overlay_map_rotations,\n"
+            # + f"        .tileset = &tiles_tileset\n"
+            # + "    },\n"
             + entrances_str
             + f"    .block_spawns = {self.block_spawns.make_assignment()}"
             + "};\n"
